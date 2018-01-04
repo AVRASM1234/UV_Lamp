@@ -36,6 +36,8 @@ Discarded input sections
  .text          0x00000000        0x0 Library/TM/TM.o
  .data          0x00000000        0x0 Library/TM/TM.o
  .bss           0x00000000        0x0 Library/TM/TM.o
+ .text.RemoveTask
+                0x00000000       0x3e Library/TM/TM.o
  .text.TimerService
                 0x00000000       0x92 Library/TM/TM.o
  .text          0x00000000        0x0 main.o
@@ -43,7 +45,7 @@ Discarded input sections
  .bss           0x00000000        0x0 main.o
  .text.MirrorDigit
                 0x00000000       0x66 main.o
- .bss.on.1919   0x00000000        0x1 main.o
+ .bss.on.1921   0x00000000        0x1 main.o
  .bss.__TS_TimerTaskQueue
                 0x00000000       0x3c main.o
  .bss.__TM_TaskQueue
@@ -524,30 +526,30 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x158
+.debug_aranges  0x00000000      0x160
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x58 Library/NOKIA5110/NOKIA5110.o
  .debug_aranges
                 0x00000058       0x28 Library/TM/ENC.o
  .debug_aranges
-                0x00000080       0x58 Library/TM/TM.o
+                0x00000080       0x60 Library/TM/TM.o
  .debug_aranges
-                0x000000d8       0x60 main.o
+                0x000000e0       0x60 main.o
  .debug_aranges
-                0x00000138       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+                0x00000140       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x17d2
+.debug_info     0x00000000     0x1816
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x48c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
  .debug_info    0x0000048c      0x6d3 Library/NOKIA5110/NOKIA5110.o
  .debug_info    0x00000b5f      0x21f Library/TM/ENC.o
- .debug_info    0x00000d7e      0x2ee Library/TM/TM.o
- .debug_info    0x0000106c      0x6bc main.o
- .debug_info    0x00001728       0xaa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_info    0x00000d7e      0x332 Library/TM/TM.o
+ .debug_info    0x000010b0      0x6bc main.o
+ .debug_info    0x0000176c       0xaa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
 
 .debug_abbrev   0x00000000      0xacd
  *(.debug_abbrev)
@@ -558,39 +560,39 @@ END GROUP
  .debug_abbrev  0x000008a2      0x217 main.o
  .debug_abbrev  0x00000ab9       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
 
-.debug_line     0x00000000      0xdad
+.debug_line     0x00000000      0xde6
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x109 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
  .debug_line    0x00000109      0x411 Library/NOKIA5110/NOKIA5110.o
  .debug_line    0x0000051a      0x156 Library/TM/ENC.o
- .debug_line    0x00000670      0x303 Library/TM/TM.o
- .debug_line    0x00000973      0x3c0 main.o
- .debug_line    0x00000d33       0x7a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_line    0x00000670      0x33c Library/TM/TM.o
+ .debug_line    0x000009ac      0x3c0 main.o
+ .debug_line    0x00000d6c       0x7a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
 
-.debug_frame    0x00000000      0x3d4
+.debug_frame    0x00000000      0x3e4
  *(.debug_frame)
  .debug_frame   0x00000000      0x158 Library/NOKIA5110/NOKIA5110.o
  .debug_frame   0x00000158       0x34 Library/TM/ENC.o
- .debug_frame   0x0000018c      0x120 Library/TM/TM.o
- .debug_frame   0x000002ac      0x128 main.o
+ .debug_frame   0x0000018c      0x130 Library/TM/TM.o
+ .debug_frame   0x000002bc      0x128 main.o
 
-.debug_str      0x00000000      0x550
+.debug_str      0x00000000      0x55b
  *(.debug_str)
  .debug_str     0x00000000      0x17a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
  .debug_str     0x0000017a      0x24d Library/NOKIA5110/NOKIA5110.o
                                 0x286 (size before relaxing)
  .debug_str     0x000003c7       0xa5 Library/TM/ENC.o
                                 0x211 (size before relaxing)
- .debug_str     0x0000046c       0x55 Library/TM/TM.o
-                                0x221 (size before relaxing)
- .debug_str     0x000004c1       0x8f main.o
+ .debug_str     0x0000046c       0x60 Library/TM/TM.o
+                                0x22c (size before relaxing)
+ .debug_str     0x000004cc       0x8f main.o
                                 0x2f4 (size before relaxing)
 
-.debug_loc      0x00000000      0xd19
+.debug_loc      0x00000000      0xd50
  *(.debug_loc)
  .debug_loc     0x00000000      0x729 Library/NOKIA5110/NOKIA5110.o
- .debug_loc     0x00000729      0x3d6 Library/TM/TM.o
- .debug_loc     0x00000aff      0x21a main.o
+ .debug_loc     0x00000729      0x40d Library/TM/TM.o
+ .debug_loc     0x00000b36      0x21a main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -610,12 +612,12 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000      0x128
+.debug_ranges   0x00000000      0x130
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x78 Library/NOKIA5110/NOKIA5110.o
  .debug_ranges  0x00000078       0x18 Library/TM/ENC.o
- .debug_ranges  0x00000090       0x48 Library/TM/TM.o
- .debug_ranges  0x000000d8       0x50 main.o
+ .debug_ranges  0x00000090       0x50 Library/TM/TM.o
+ .debug_ranges  0x000000e0       0x50 main.o
 
 .debug_macro
  *(.debug_macro)

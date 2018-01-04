@@ -16,21 +16,27 @@
 
 
 
-unsigned char TimeModes[5][3] EEMEM =
+unsigned char EE_TimeModes[5][3] EEMEM =
 {
 	{  0,  0, 30 },
 	{  0,  1,  0 },
 	{  0,  1, 30 },
 	{  0,  2,  0 },
-	{  0,  2, 30 }
+	{  0,  2, 30 }																// Ячейки хранения содержимого наших пресетов
 };
-unsigned char Time[3];
-unsigned char DisplayN = 0;
+unsigned char EE_TimerSettings[3] EEMEM = {0, 10, 1};							// Ячейки хранения настроек таймера
+	
+unsigned char Time[3];															// Время таймера
+unsigned char Setting[3];														// Настройки таймера
+//unsigned char TimerDalay, Bright, Sound;
+unsigned char DisplayN = 0, RSeg = 0;											// Местонахождение в древе меню. Бит сброса сегмента.
 
 
-
+/*Обновление содержимого дисплея*/
 void DisplayUpdate(void);
-void PrintTime(void);
+/*Вывод динамических параметров на дисплей*/
+void PrintParameters(void);
+/*Прочитать время из ячейки пресета*/
 void ReadTime(void);
 
 
@@ -52,6 +58,8 @@ int main(void)
 	}
 }
 
+
+
 void DisplayUpdate(void)
 {
 	LCD5110_Clear();
@@ -60,31 +68,31 @@ void DisplayUpdate(void)
 		case 0:
 		{
 			HeaderPrints("<Режим #1>");
-			PrintTime();
+			PrintParameters();
 			break;
 		}
 		case 1:
 		{
 			HeaderPrints("<Режим #2>");
-			PrintTime();
+			PrintParameters();
 			break;
 		}
 		case 2:
 		{
 			HeaderPrints("<Режим #3>");
-			PrintTime();
+			PrintParameters();
 			break;
 		}
 		case 3:
 		{
 			HeaderPrints("<Режим #4>");
-			PrintTime();
+			PrintParameters();
 			break;
 		}
 		case 4:
 		{
 			HeaderPrints("<Режим #5>");
-			PrintTime();
+			PrintParameters();
 			break;
 		}
 		case 5:
@@ -99,45 +107,65 @@ void DisplayUpdate(void)
 	}
 }
 
-void PrintTime(void)
-{
+
+
+/*Объедени DisplayUpdate и PrintParameters*/
+void PrintParameters(void)
+{	
 	char str[9];
-	for (unsigned char i=0; i<3; i++)
+	unsigned char ZeroInd = 0;
+	if (DisplayN<50)
 	{
-		str[3*i] = Time[i]/10 + '0';
-		str[3*i+1] = Time[i]%10 + '0';
-		str[3*i+2] = ':';
+		for (unsigned char i=0; i<3; i++)
+		{
+			str[3*i] = Time[i]/10 + '0';
+			str[3*i+1] = Time[i]%10 + '0';
+			str[3*i+2] = ':';
+		}
+		str[8] = 0;
+		
+		if ((DisplayN%10) && (RSeg))
+		{
+			str[9 - (DisplayN%10)*3] = ' ';
+			str[10 - (DisplayN%10)*3] = ' ';
+		}
+		LCD5110_LargeNumPrints(str, 10, 3);		
 	}
-	str[8] = 0;
-	LCD5110_LargeNumPrints(str, 10, 3);
+	else
+	{
+		for (unsigned char i=0; i<3; i++)
+		{
+			if ()
+			{
+			}
+		}
+		if (ZeroInd)
+		{
+			str[0] = Setting[0]/100+'0';
+			
+			
+		
+		// Вывод параметров звука	
+		if (Setting[2])
+			LCD5110_Prints(" Вкл.", 7, 5);
+		else
+			LCD5110_Prints("Выкл.", 7, 5);
+	}
 }
+
+
 
 inline void ReadTime(void)
 {
 	for (unsigned char i=0; i<3; i++)
-		Time[i] = eeprom_read_byte(&TimeModes[DisplayN/10][i]);
+		Time[i] = eeprom_read_byte(&EE_TimeModes[DisplayN/10][i]);
 }
+
+
 
 void MirrorDigit(void)
 {
-	static unsigned char on;
-	if (DisplayN%10)
-	{
-		if (DisplayN < 50)
-		{
-			if (on == 0)
-			{
-				LCD5110_LargeNumPrints("  ", 10 + 24*(3-DisplayN%10), 3);
-				on = 1;
-			}
-			else
-			{
-				DisplayUpdate();
-				on = 0;
-			}
-		}
-		SendTimerTask(MirrorDigit, 500);	
-	}
+	//// Мерцание сегмента
 }
 
 //***************************************************************************

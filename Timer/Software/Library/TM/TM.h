@@ -42,6 +42,10 @@ extern void RTOS_Run(void);
 extern void SendTask(TPTR Task);
 /*Отправка задачи в очередь таймерной службы*/
 extern void SendTimerTask(TPTR Task, uint16_t Time);
+/*Обновление тайминга задачи*/
+extern void UpdateTimerTask(TPTR Task, uint16_t Time);
+/*Удаление задачи из таймерной службы*/
+extern void RemoveTask (TPTR Task);
 /*Запуск диспетчера задач*/
 extern void TaskManager(void);
 /*Запуск таймерной службы*/
