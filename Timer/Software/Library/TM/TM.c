@@ -128,13 +128,15 @@ void UpdateTimerTask(TPTR Task, uint16_t Time)
 //***************************************************************************
 // Удаление задачи из таймерной службы
 //***************************************************************************
-void RemoveTask (TPTR Task)
+uint16_t RemoveTask (TPTR Task)
 {
-	for (uint8_t i = 0; i < __TS_TimerQueueSize; i++)						// Прочесываем очередь
-	{
-		if (__TS_TimerTaskQueue[i].Task == Task)							// Если натыкаемся на нашу задачу...
-			__TS_TimerTaskQueue[i].Task = Idle;								// ...удаляем ее нафиг, записав затычку на ее место
-	}
+	uint8_t i = 0;
+	while ((i < __TS_TimerQueueSize) && (__TS_TimerTaskQueue[i].Task != Task))		
+		i++;																// Прочесываем очередь
+																			// Если натыкаемся на нашу задачу...
+	__TS_TimerTaskQueue[i].Task = Idle;										// ...удаляем ее нафиг, записав затычку на ее место
+	
+	return __TS_TimerTaskQueue[i].Time;										// И возвращаем время, через которое задача могла выполниться
 }
 
 

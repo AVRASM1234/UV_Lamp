@@ -8,11 +8,16 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
                               Library/TM/ENC.o (__do_clear_bss)
 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
                               main.o (eeprom_read_byte)
+C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
+                              main.o (eeprom_write_byte)
 
 Allocating common symbols
 Common symbol       size              file
 
 __TM_TaskCnt        0x1               Library/TM/ENC.o
+TimerDelay          0x1               main.o
+TimerTemp           0x1               main.o
+Settings            0x3               main.o
 __TM_Start          0x1               Library/TM/ENC.o
 __ENC_But_CNT       0x1               Library/TM/ENC.o
 __ENC_PrevState     0x1               Library/TM/ENC.o
@@ -36,16 +41,11 @@ Discarded input sections
  .text          0x00000000        0x0 Library/TM/TM.o
  .data          0x00000000        0x0 Library/TM/TM.o
  .bss           0x00000000        0x0 Library/TM/TM.o
- .text.RemoveTask
-                0x00000000       0x3e Library/TM/TM.o
  .text.TimerService
                 0x00000000       0x92 Library/TM/TM.o
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
- .text.MirrorDigit
-                0x00000000       0x66 main.o
- .bss.on.1921   0x00000000        0x1 main.o
  .bss.__TS_TimerTaskQueue
                 0x00000000       0x3c main.o
  .bss.__TM_TaskQueue
@@ -101,6 +101,9 @@ Discarded input sections
  .text          0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
  .data          0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
  .bss           0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .text          0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
+ .data          0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
+ .bss           0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
 
 Memory Configuration
 
@@ -228,7 +231,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0xdba
+.text           0x00000000     0x137c
  *(.vectors)
  .vectors       0x00000000       0x26 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
                 0x00000000                __vector_default
@@ -358,41 +361,63 @@ END GROUP
  .text.SendTimerTask
                 0x000008da       0x64 Library/TM/TM.o
                 0x000008da                SendTimerTask
+ .text.UpdateTimerTask
+                0x0000093e       0x4a Library/TM/TM.o
+                0x0000093e                UpdateTimerTask
+ .text.RemoveTask
+                0x00000988       0x60 Library/TM/TM.o
+                0x00000988                RemoveTask
  .text.TaskManager
-                0x0000093e       0x46 Library/TM/TM.o
-                0x0000093e                TaskManager
+                0x000009e8       0x46 Library/TM/TM.o
+                0x000009e8                TaskManager
  .text.__vector_9
-                0x00000984       0xd8 Library/TM/TM.o
-                0x00000984                __vector_9
- .text.PrintTime
-                0x00000a5c       0x9e main.o
-                0x00000a5c                PrintTime
+                0x00000a2e       0xd8 Library/TM/TM.o
+                0x00000a2e                __vector_9
+ .text.PrintParameters
+                0x00000b06      0x210 main.o
+                0x00000b06                PrintParameters
  .text.DisplayUpdate
-                0x00000afa       0x88 main.o
-                0x00000afa                DisplayUpdate
- .text.ReadTime
-                0x00000b82       0x5e main.o
-                0x00000b82                ReadTime
- .text.main     0x00000be0       0x12 main.o
-                0x00000be0                main
- .text.ENC_Inc  0x00000bf2       0x9a main.o
-                0x00000bf2                ENC_Inc
- .text.ENC_Dec  0x00000c8c       0x96 main.o
-                0x00000c8c                ENC_Dec
+                0x00000d16       0x9a main.o
+                0x00000d16                DisplayUpdate
+ .text.MirrorDigit
+                0x00000db0       0x1e main.o
+                0x00000db0                MirrorDigit
+ .text.main     0x00000dce       0x7e main.o
+                0x00000dce                main
+ .text.ENC_Inc  0x00000e4c      0x12c main.o
+                0x00000e4c                ENC_Inc
+ .text.ENC_Dec  0x00000f78      0x134 main.o
+                0x00000f78                ENC_Dec
+ .text.TimerStart
+                0x000010ac       0x3e main.o
+                0x000010ac                TimerStart
+ .text.TimerPause
+                0x000010ea       0x1c main.o
+                0x000010ea                TimerPause
  .text.ENC_ShortPress
-                0x00000d22       0x52 main.o
-                0x00000d22                ENC_ShortPress
+                0x00001106       0x66 main.o
+                0x00001106                ENC_ShortPress
+ .text.TimerStop
+                0x0000116c       0x72 main.o
+                0x0000116c                TimerStop
  .text.ENC_LongPress
-                0x00000d74       0x32 main.o
-                0x00000d74                ENC_LongPress
+                0x000011de       0xf8 main.o
+                0x000011de                ENC_LongPress
+ .text.TimerStep
+                0x000012d6       0x78 main.o
+                0x000012d6                TimerStep
  .text.avr-libc
-                0x00000da6       0x10 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
-                0x00000da6                eeprom_read_byte
-                0x00000db6                . = ALIGN (0x2)
+                0x0000134e       0x10 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+                0x0000134e                eeprom_read_byte
+ .text.avr-libc
+                0x0000135e       0x1a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
+                0x0000135e                eeprom_write_byte
+                0x00001360                eeprom_write_r18
+                0x00001378                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000db6        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr4\libgcc.a(_exit.o)
-                0x00000db6                _exit
-                0x00000db6                exit
+ .fini9         0x00001378        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr4\libgcc.a(_exit.o)
+                0x00001378                _exit
+                0x00001378                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -411,59 +436,68 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000db6        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr4\libgcc.a(_exit.o)
+ .fini0         0x00001378        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.9.2/avr4\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000dba                _etext = .
+                0x0000137c                _etext = .
 
-.data           0x00800060       0x74 load address 0x00000dba
+.data           0x00800060       0x82 load address 0x0000137c
                 0x00800060                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
  *(.rodata)
  *(.rodata*)
  .rodata.str1.1
-                0x00800060       0x73 main.o
+                0x00800060       0x82 main.o
+                                 0x86 (size before relaxing)
  *(.gnu.linkonce.d*)
-                0x008000d4                . = ALIGN (0x2)
- *fill*         0x008000d3        0x1 
-                0x008000d4                _edata = .
-                0x008000d4                PROVIDE (__data_end, .)
+                0x008000e2                . = ALIGN (0x2)
+                0x008000e2                _edata = .
+                0x008000e2                PROVIDE (__data_end, .)
 
-.bss            0x008000d4       0x6d
-                0x008000d4                PROVIDE (__bss_start, .)
+.bss            0x008000e2       0x74
+                0x008000e2                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  .bss.__TS_TimerTaskQueue
-                0x008000d4       0x3c Library/TM/TM.o
+                0x008000e2       0x3c Library/TM/TM.o
  .bss.__TM_TaskQueue
-                0x00800110       0x28 Library/TM/TM.o
- .bss.DisplayN  0x00800138        0x1 main.o
-                0x00800138                DisplayN
+                0x0080011e       0x28 Library/TM/TM.o
+ .bss.RSeg      0x00800146        0x1 main.o
+                0x00800146                RSeg
+ .bss.DisplayN  0x00800147        0x1 main.o
+                0x00800147                DisplayN
+ .bss.TimerState
+                0x00800148        0x1 main.o
+                0x00800148                TimerState
  *(COMMON)
- COMMON         0x00800139        0x5 Library/TM/ENC.o
-                0x00800139                __TM_TaskCnt
-                0x0080013a                __TM_Start
-                0x0080013b                __ENC_But_CNT
-                0x0080013c                __ENC_PrevState
-                0x0080013d                __TM_End
- COMMON         0x0080013e        0x3 main.o
-                0x0080013e                Time
-                0x00800141                PROVIDE (__bss_end, .)
-                0x00000dba                __data_load_start = LOADADDR (.data)
-                0x00000e2e                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x00800149        0x5 Library/TM/ENC.o
+                0x00800149                __TM_TaskCnt
+                0x0080014a                __TM_Start
+                0x0080014b                __ENC_But_CNT
+                0x0080014c                __ENC_PrevState
+                0x0080014d                __TM_End
+ COMMON         0x0080014e        0x8 main.o
+                0x0080014e                TimerDelay
+                0x0080014f                TimerTemp
+                0x00800150                Settings
+                0x00800153                Time
+                0x00800156                PROVIDE (__bss_end, .)
+                0x0000137c                __data_load_start = LOADADDR (.data)
+                0x000013fe                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800141        0x0
+.noinit         0x00800156        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x00800141                _end = .
+                0x00800156                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
-.eeprom         0x00810000        0xf
+.eeprom         0x00810000       0x12
  *(.eeprom*)
- .eeprom        0x00810000        0xf main.o
-                0x00810000                TimeModes
-                0x0081000f                __eeprom_end = .
+ .eeprom        0x00810000       0x12 main.o
+                0x00810000                EE_TimerSettings
+                0x00810003                EE_TimeModes
+                0x00810012                __eeprom_end = .
 
 .fuse
  *(.fuse)
@@ -526,73 +560,78 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x160
+.debug_aranges  0x00000000      0x1a0
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x58 Library/NOKIA5110/NOKIA5110.o
  .debug_aranges
                 0x00000058       0x28 Library/TM/ENC.o
  .debug_aranges
-                0x00000080       0x60 Library/TM/TM.o
+                0x00000080       0x68 Library/TM/TM.o
  .debug_aranges
-                0x000000e0       0x60 main.o
+                0x000000e8       0x78 main.o
  .debug_aranges
-                0x00000140       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+                0x00000160       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_aranges
+                0x00000180       0x20 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x1816
+.debug_info     0x00000000     0x1eb2
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x48c C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
  .debug_info    0x0000048c      0x6d3 Library/NOKIA5110/NOKIA5110.o
  .debug_info    0x00000b5f      0x21f Library/TM/ENC.o
- .debug_info    0x00000d7e      0x332 Library/TM/TM.o
- .debug_info    0x000010b0      0x6bc main.o
- .debug_info    0x0000176c       0xaa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_info    0x00000d7e      0x372 Library/TM/TM.o
+ .debug_info    0x000010f0      0xc6e main.o
+ .debug_info    0x00001d5e       0xaa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_info    0x00001e08       0xaa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
 
-.debug_abbrev   0x00000000      0xacd
+.debug_abbrev   0x00000000      0xb14
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x44e C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
  .debug_abbrev  0x0000044e      0x1ac Library/NOKIA5110/NOKIA5110.o
  .debug_abbrev  0x000005fa      0x105 Library/TM/ENC.o
- .debug_abbrev  0x000006ff      0x1a3 Library/TM/TM.o
- .debug_abbrev  0x000008a2      0x217 main.o
- .debug_abbrev  0x00000ab9       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_abbrev  0x000006ff      0x1bf Library/TM/TM.o
+ .debug_abbrev  0x000008be      0x22e main.o
+ .debug_abbrev  0x00000aec       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_abbrev  0x00000b00       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
 
-.debug_line     0x00000000      0xde6
+.debug_line     0x00000000     0x11d3
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x109 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
  .debug_line    0x00000109      0x411 Library/NOKIA5110/NOKIA5110.o
  .debug_line    0x0000051a      0x156 Library/TM/ENC.o
- .debug_line    0x00000670      0x33c Library/TM/TM.o
- .debug_line    0x000009ac      0x3c0 main.o
- .debug_line    0x00000d6c       0x7a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_line    0x00000670      0x36d Library/TM/TM.o
+ .debug_line    0x000009dd      0x6e4 main.o
+ .debug_line    0x000010c1       0x7a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eerd_byte.o)
+ .debug_line    0x0000113b       0x98 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4\libatmega8a.a(eewr_byte.o)
 
-.debug_frame    0x00000000      0x3e4
+.debug_frame    0x00000000      0x45c
  *(.debug_frame)
  .debug_frame   0x00000000      0x158 Library/NOKIA5110/NOKIA5110.o
  .debug_frame   0x00000158       0x34 Library/TM/ENC.o
- .debug_frame   0x0000018c      0x130 Library/TM/TM.o
- .debug_frame   0x000002bc      0x128 main.o
+ .debug_frame   0x0000018c      0x140 Library/TM/TM.o
+ .debug_frame   0x000002cc      0x190 main.o
 
-.debug_str      0x00000000      0x55b
+.debug_str      0x00000000      0x64a
  *(.debug_str)
  .debug_str     0x00000000      0x17a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega8a/avr4/crtatmega8a.o
  .debug_str     0x0000017a      0x24d Library/NOKIA5110/NOKIA5110.o
                                 0x286 (size before relaxing)
- .debug_str     0x000003c7       0xa5 Library/TM/ENC.o
+ .debug_str     0x000003c7       0xdd Library/TM/ENC.o
                                 0x211 (size before relaxing)
- .debug_str     0x0000046c       0x60 Library/TM/TM.o
-                                0x22c (size before relaxing)
- .debug_str     0x000004cc       0x8f main.o
-                                0x2f4 (size before relaxing)
+ .debug_str     0x000004a4       0x70 Library/TM/TM.o
+                                0x23c (size before relaxing)
+ .debug_str     0x00000514      0x136 main.o
+                                0x3de (size before relaxing)
 
-.debug_loc      0x00000000      0xd50
+.debug_loc      0x00000000     0x108a
  *(.debug_loc)
  .debug_loc     0x00000000      0x729 Library/NOKIA5110/NOKIA5110.o
- .debug_loc     0x00000729      0x40d Library/TM/TM.o
- .debug_loc     0x00000b36      0x21a main.o
+ .debug_loc     0x00000729      0x492 Library/TM/TM.o
+ .debug_loc     0x00000bbb      0x4cf main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -612,12 +651,12 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000      0x130
+.debug_ranges   0x00000000      0x168
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x78 Library/NOKIA5110/NOKIA5110.o
  .debug_ranges  0x00000078       0x18 Library/TM/ENC.o
- .debug_ranges  0x00000090       0x50 Library/TM/TM.o
- .debug_ranges  0x000000e0       0x50 main.o
+ .debug_ranges  0x00000090       0x58 Library/TM/TM.o
+ .debug_ranges  0x000000e8       0x80 main.o
 
 .debug_macro
  *(.debug_macro)
