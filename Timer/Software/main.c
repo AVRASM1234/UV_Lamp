@@ -17,20 +17,22 @@
 #include <avr/io.h>
 #include <avr/eeprom.h>
 #include <util/delay.h>
+#include <stdbool.h>
 #include "Library/NOKIA5110/NOKIA5110.h"
 #include "Library/TM/TM.h"
 #include "Library/TM/ENC.h"
 
 
 
-unsigned char EE_TimeModes[5][3] EEMEM =
+uint32_t EE_TimeModes[5] EEMEM = { 30, 60, 90, 120, 150};						// Ячейки хранения содержимого наших пресетов
+typedef struct EEMEM 
 {
-	{  0,  0, 30 },
-	{  0,  1,  0 },
-	{  0,  1, 30 },
-	{  0,  2,  0 },
-	{  0,  2, 30 }																// Ячейки хранения содержимого наших пресетов
-};
+	unsigned char Delay;
+	unsigned char Bright;
+	bool Sound;
+} settings;
+
+set
 unsigned char EE_TimerSettings[3] EEMEM = {0, 10, 1};							// Ячейки хранения настроек таймера
 	
 unsigned char Time[3];															// Время таймера
