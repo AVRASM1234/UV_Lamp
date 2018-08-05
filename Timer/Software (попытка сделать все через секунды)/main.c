@@ -7,10 +7,6 @@
 
 #define F_CPU	8000000UL
 
-#define TS_Wait			0
-#define TS_Work			1
-#define TS_Pause		2
-
 #define TimerDDR		DDRB
 #define TimerPort		PORTB
 #define TimerNPin		0
@@ -33,14 +29,17 @@ unsigned char EE_TimerSettings[3] EEMEM = {0, 10, 1};							// Ячейки хранения н
 	
 	
 	
-uint32_t Time;																	// Время таймера в секундах
+unsigned char Time[3];															// Время таймера
+																				//  Time[0] - часы
+																				//  Time[1] - минуты
+																				//  Time[2] - секунды
 																				
 unsigned char Settings[3];														// Настройки таймера:
 																				//  Settings[0] - задержка
 																				//  Settings[1] - яркость подсветки
 																				//  Settings[2] - звук
 
-unsigned char TimerState = TS_Wait;												// Состояние таймера:
+unsigned char TimerState = 0;													// Состояние таймера:
 																				//  0 - режим ожидания
 																				//  1 - рабочий режим
 																				//  2 - пауза
@@ -150,8 +149,8 @@ void PrintParameters(void)
 	{
 		for (i = 0; i < 3; i++)
 		{
-			str[3*i] = Time/36000 + '0';
-			str[3*i+1] = (Time/3600) % 10 + '0';
+			str[3*i] = Time[i]/10 + '0';
+			str[3*i+1] = Time[i]%10 + '0';
 			str[3*i+2] = ':';
 		}
 		str[8] = 0;
@@ -212,7 +211,7 @@ void PrintParameters(void)
 void ENC_Inc(void)
 {
 //Здесь может быть ваш код ;)
-	if (TimerState == TS_Wait)
+	if (TimerState == 0)
 	{
 		if (DisplayN%10 == 0)
 		{
@@ -285,7 +284,7 @@ void ENC_Inc(void)
 void ENC_Dec(void)
 {
 //Здесь может быть ваш код ;)
-	if(TimerState == TS_Wait)
+	if(TimerState == 0)
 	{
 		if (DisplayN%10 == 0)
 		{
@@ -359,7 +358,7 @@ void ENC_ShortPress(void)
 	{
 		if (DisplayN < 50)
 		{
-			if (TimerState == TS_Work)
+			if (TimerState == 1)
 				TimerPause();
 			else
 				TimerStart();
@@ -384,7 +383,7 @@ void ENC_ShortPress(void)
 //***************************************************************************
 void ENC_LongPress(void)
 {
-	if (TimerState == TS_Wait)
+	if (TimerState == 0)
 	{
 		if (DisplayN%10 == 0)
 		{
@@ -417,38 +416,38 @@ void ENC_LongPress(void)
 void TimerStart(void)
 {
 	
-	if (TimerState == TS_Wait)
+	if (TimerState == 0)
 	{
 		TimerDelay = Settings[0];
 		SendTimerTask(TimerStep, 1000);
 	}
 	else
 	{
-		if (TimerState == TS_Pause)
+		if (TimerState == 2)
 			SendTimerTask(TimerStep, TimerTemp);
 	}
 	
-	TimerState = TS_Work;
+	TimerState = 1;
 	if (TimerDelay == 0)
 		TimerON();
 }
 
 void TimerPause(void)
 {
-	if (TimerState == TS_Work)
+	if (TimerState == 1)
 	{
 		TimerOFF();
 		TimerTemp = RemoveTask(TimerStep);
-		TimerState = TS_Pause;
+		TimerState = 2;
 	}
 }
 
 void TimerStop(void)
 {
 	TimerOFF();
-	if (TimerState == TS_Work)
+	if (TimerState == 1)
 		RemoveTask(TimerStep);
-	TimerState = TS_Wait;	
+	TimerState = 0;	
 	ReadTime();
 }
 
@@ -458,9 +457,25 @@ void TimerStep(void)
 	SendTask(PrintParameters);
 	if(TimerDelay == 0)
 	{
-		Time--;
-		if (Time == 0)
-			TimerStop();
+		if (Time[2])
+		{
+			Time[2]--;
+			if ((Time[0] == 0) && (Time[1] == 0) && (Time[2] == 0))
+				TimerStop();
+		}
+		else
+		{
+			Time[2] = 59;
+			
+			if (Time[1])
+				Time[1]--;
+			else
+			{
+				Time[1] = 59;
+				if (Time[0])
+					Time[0]--;
+			}
+		}
 	}
 	else
 	{
@@ -473,7 +488,9 @@ void TimerStep(void)
 /*Считывание и запись параметров таймера*/
 inline void ReadTime(void)
 {
-	Time = eeprom_read_dword(&EE_TimeModes[DisplayN/10]);
+	Time[0] = eeprom_read_dword(&EE_TimeModes[DisplayN/10]) / 3600;
+	Time[1] = (eeprom_read_dword(&EE_TimeModes[DisplayN/10]) / 60) % 60;
+	Time[2] = eeprom_read_dword(&EE_TimeModes[DisplayN/10]) % 60;
 }
 
 inline void ReadSettings(void)
@@ -486,7 +503,11 @@ inline void ReadSettings(void)
 
 inline void WriteTime(void)
 {
-	eeprom_write_dword(&EE_TimeModes[DisplayN/10], Time);
+	eeprom_write_dword(&EE_TimeModes[DisplayN/10], Time[0]*3600 + Time[1]*60 + Time[2]);
+	for (unsigned char i=0; i<3; i++)
+	{
+		
+	}
 }
 
 inline void WriteSettings(void)
