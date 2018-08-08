@@ -7,40 +7,60 @@
 
 #define F_CPU	8000000UL
 
-#define TS_Wait			0
-#define TS_Work			1
-#define TS_Pause		2
-
 #define TimerDDR		DDRB
 #define TimerPort		PORTB
 #define TimerNPin		0
 
-#define TimerON()		PORTB |= (1<<TimerNPin)
-#define TimerOFF()		PORTB &= ~(1<<TimerNPin)
+#define BuzzerDDR		DDRC
+#define BuzzerPort		PORTC
+#define BuzzerNPin		2
+
+#define TimerON()		TimerPort |= (1<<TimerNPin);
+#define TimerOFF()		TimerPort &= ~(1<<TimerNPin);
+
+#define TS_Wait			0
+#define TS_Work			1
+#define TS_Pause		2
+
+
 
 #include <avr/io.h>
 #include <avr/eeprom.h>
 #include <util/delay.h>
-#include <stdbool.h>
+#include <stdlib.h>
 #include "Library/NOKIA5110/NOKIA5110.h"
 #include "Library/TM/TM.h"
 #include "Library/TM/ENC.h"
 
+const unsigned char PerToFill[11] PROGMEM =
+{
+	0x00, 0x02, 0x03, 
+	0x05, 0x09, 0x10, 
+	0x1C, 0x30, 0x54, 
+	0x91, 0xFF
+};
 
-
-uint32_t EE_TimeModes[5] EEMEM = {30, 60, 90, 120, 150};						// Ячейки хранения содержимого наших пресетов
-unsigned char EE_TimerSettings[3] EEMEM = {0, 10, 1};							// Ячейки хранения настроек таймера
+unsigned char EE_TimeModes[5][3] EEMEM =
+{
+	{  0,  0,  3 },
+	{  0,  1,  0 },
+	{  0,  1, 30 },
+	{  0,  2,  0 },
+	{  0,  2, 30 }																// Ячейки хранения содержимого наших пресетов
+};
+unsigned char EE_TimerSettings[3] EEMEM = {5, 80, 1};							// Ячейки хранения настроек таймера
 	
-	
-	
-uint32_t Time;																	// Время таймера в секундах
+unsigned char Time[3];															// Время таймера
+																				//  Time[0] - часы
+																				//  Time[1] - минуты
+																				//  Time[2] - секунды
 																				
 unsigned char Settings[3];														// Настройки таймера:
 																				//  Settings[0] - задержка
 																				//  Settings[1] - яркость подсветки
 																				//  Settings[2] - звук
 
-unsigned char TimerState = TS_Wait;												// Состояние таймера:
+unsigned char TimerState = TS_Wait;													// Состояние таймера:
 																				//  0 - режим ожидания
 																				//  1 - рабочий режим
 																				//  2 - пауза
@@ -68,16 +88,33 @@ inline void WriteSettings(void);
 /*Мерцание сегментов*/
 void MirrorDigit(void);
 
+void Beep(uint16_t Time);
+
+void BuzzerOFF(void);
 
 int main(void)
 {
 	TimerDDR |= (1<<TimerNPin);
 	TimerPort &= ~(1<<TimerNPin);
+	
+	BuzzerDDR |= (1<<BuzzerNPin);
+	BuzzerPort &= ~(1<<BuzzerNPin);
+	
+	
+	DDRB |= (1<<3);
+	PORTB &= ~(1<<3);
+	TCCR2 = 0b01101001;								// Настраиваем таймер 2 для работы в режиме FastPWM
+	TIMSK &= ~((1<<OCIE2)|(1<<TOIE2));				// Вырубаем все его прерывания
+	
+	OCR2 = 100; 
+	
 	RTOS_Init();
 	RTOS_Run();
 	
 	ReadSettings();
 	ReadTime();
+	
+	OCR2 = pgm_read_byte(&PerToFill[Settings[1]/10]);
 	
 	ENC_Init();
 	
@@ -94,43 +131,63 @@ int main(void)
 
 void DisplayUpdate(void)
 {
-	LCD5110_SetXY(0, 3);
+	LCD5110_SetXY(0, 3);											// Очищаем поле параметров (где пишется время и настройки)
 	for (unsigned int i = 0; i < 84*3; i++)
 		LCD5110_SendByte(0, 1);
 		
-	switch (DisplayN/10)
+	switch (TimerState)												// Обновляем шапку
 	{
-		case 0:
-		{
-			HeaderPrints("<Режим #1>");
+		case TS_Wait:
+		{	
+			switch (DisplayN/10)
+			{
+				case 0:
+				{
+					HeaderPrints("<Режим #1>");
+					break;
+				}
+				case 1:
+				{
+					HeaderPrints("<Режим #2>");
+					break;
+				}
+				case 2:
+				{
+					HeaderPrints("<Режим #3>");
+					break;
+				}
+				case 3:
+				{
+					HeaderPrints("<Режим #4>");
+					break;
+				}
+				case 4:
+				{
+					HeaderPrints("<Режим #5>");
+					break;
+				}
+				case 5:
+				{
+					HeaderPrints("<Настройки>");
+					LCD5110_Prints("Задержка     с", 0, 3);
+					LCD5110_Prints("Яркость      %", 0, 4);
+					LCD5110_Prints("Звук", 0, 5);
+					break;
+				}
+			}
 			break;
 		}
-		case 1:
+		case TS_Work:
 		{
-			HeaderPrints("<Режим #2>");
+			if (TimerDelay)
+				HeaderPrints("Задержка");
+			else
+				HeaderPrints("Идет отсчет");
 			break;
 		}
-		case 2:
+		case TS_Pause:
 		{
-			HeaderPrints("<Режим #3>");
-			break;
-		}
-		case 3:
-		{
-			HeaderPrints("<Режим #4>");
-			break;
-		}
-		case 4:
-		{
-			HeaderPrints("<Режим #5>");
-			break;
-		}
-		case 5:
-		{
-			HeaderPrints("<Настройки>");
-			LCD5110_Prints("Задержка     с", 0, 3);
-			LCD5110_Prints("Яркость      %", 0, 4);
-			LCD5110_Prints("Звук", 0, 5);
+			HeaderPrints("Пауза");
 			break;
 		}
 	}
@@ -148,20 +205,38 @@ void PrintParameters(void)
 	
 	if (DisplayN<50)
 	{
-		for (i = 0; i < 3; i++)
-		{
-			str[3*i] = Time/36000 + '0';
-			str[3*i+1] = (Time/3600) % 10 + '0';
-			str[3*i+2] = ':';
-		}
-		str[8] = 0;
+		if (TimerDelay == 0)
+		{		
+			for (i = 0; i < 3; i++)
+			{
+				str[3*i] = Time[i]/10 + '0';
+				str[3*i+1] = Time[i]%10 + '0';
+				str[3*i+2] = ':';
+			}
+			str[8] = 0;
 		
-		if ((DisplayN%10) && (RSeg))
-		{
-			str[9 - (DisplayN%10)*3] = ' ';
-			str[10 - (DisplayN%10)*3] = ' ';
+			if ((DisplayN%10) && (RSeg))
+			{
+				str[9 - (DisplayN%10)*3] = ' ';
+				str[10 - (DisplayN%10)*3] = ' ';
+			}
+			LCD5110_LargeNumPrints(str, 10, 3);		
 		}
-		LCD5110_LargeNumPrints(str, 10, 3);		
+		else
+		{
+			// Преобразовываем число в самозатирающуюся строку (которая сама затрет ненужные цифры при перехое от двухразрядного числа в одноразрядное, например).
+			itoa(TimerDelay, &str[1], 10);
+			str[0] = ' ';
+			i = 0;
+			while ((i < 4) && (str[i] != 0 ))
+				i++;
+			
+			str[i] = ' ';
+			str[i+1] = 0;
+			i++;
+			// И передаем ее на печать
+			LCD5110_LargeNumPrints(str, (84-8*i)/2, 3);
+		}
 	}
 	else
 	{
@@ -259,7 +334,7 @@ void ENC_Inc(void)
 						Settings[1] += 10;
 						if (Settings[1] > 100)
 							Settings[1] = 0;
-					 
+						OCR2 = pgm_read_byte(&PerToFill[Settings[1]/10]);
 						break;
 					}
 					case 2:
@@ -330,7 +405,7 @@ void ENC_Dec(void)
 						Settings[1] -= 10;
 						if (Settings[1] > 100)
 						Settings[1] = 100;
-					
+						OCR2 = pgm_read_byte(&PerToFill[Settings[1]/10]);
 						break;
 					}
 					case 2:
@@ -355,6 +430,7 @@ void ENC_Dec(void)
 //***************************************************************************
 void ENC_ShortPress(void)
 {
+	BuzzerOFF();
 	if (DisplayN%10 == 0)
 	{
 		if (DisplayN < 50)
@@ -363,6 +439,7 @@ void ENC_ShortPress(void)
 				TimerPause();
 			else
 				TimerStart();
+		Beep(50);
 		}
 	}
 	else
@@ -374,6 +451,7 @@ void ENC_ShortPress(void)
 		}
 		//RSeg = 0;
 		//UpdateTimerTask(MirrorDigit, 500);
+		Beep(50);
 	}
 }
 
@@ -384,6 +462,7 @@ void ENC_ShortPress(void)
 //***************************************************************************
 void ENC_LongPress(void)
 {
+	BuzzerOFF();
 	if (TimerState == TS_Wait)
 	{
 		if (DisplayN%10 == 0)
@@ -411,12 +490,12 @@ void ENC_LongPress(void)
 		TimerStop();
 		SendTask(PrintParameters);
 	}
+	Beep(50);
 }
 
 
 void TimerStart(void)
 {
-	
 	if (TimerState == TS_Wait)
 	{
 		TimerDelay = Settings[0];
@@ -428,19 +507,20 @@ void TimerStart(void)
 			SendTimerTask(TimerStep, TimerTemp);
 	}
 	
-	TimerState = TS_Work;
 	if (TimerDelay == 0)
 		TimerON();
+		
+	TimerState = TS_Work;
+	SendTask(DisplayUpdate);
 }
 
 void TimerPause(void)
 {
-	if (TimerState == TS_Work)
-	{
-		TimerOFF();
-		TimerTemp = RemoveTask(TimerStep);
-		TimerState = TS_Pause;
-	}
+	TimerOFF();
+	TimerTemp = RemoveTask(TimerStep);
+	
+	TimerState = TS_Pause;
+	SendTask(DisplayUpdate);
 }
 
 void TimerStop(void)
@@ -448,8 +528,11 @@ void TimerStop(void)
 	TimerOFF();
 	if (TimerState == TS_Work)
 		RemoveTask(TimerStep);
-	TimerState = TS_Wait;	
+		
 	ReadTime();
+	TimerDelay = 0;
+	TimerState = TS_Wait;	
+	SendTask(DisplayUpdate);
 }
 
 void TimerStep(void)
@@ -458,22 +541,56 @@ void TimerStep(void)
 	SendTask(PrintParameters);
 	if(TimerDelay == 0)
 	{
-		Time--;
-		if (Time == 0)
-			TimerStop();
+		if (Time[2])
+		{
+			Time[2]--;
+			if ((Time[0] == 0) && (Time[1] == 0) && (Time[2] == 0))
+			{
+				TimerStop();
+				Beep(500);
+			}
+			else
+			{
+				if ((Time[0] == 0) && (Time[1] == 0) && (Time[2] <= 5))
+				    Beep(100);
+			}
+		}
+		else
+		{
+			Time[2] = 59;
+			
+			if (Time[1])
+				Time[1]--;
+			else
+			{
+				Time[1] = 59;
+				if (Time[0])
+					Time[0]--;
+			}
+		}
 	}
 	else
 	{
 		TimerDelay--;
 		if (TimerDelay == 0)
+		{
 			TimerON();
+			Beep(500);
+			SendTask(DisplayUpdate);
+		}
+		else
+			if (TimerDelay <= 5)
+				Beep(100);
 	}
 }
 
 /*Считывание и запись параметров таймера*/
 inline void ReadTime(void)
 {
-	Time = eeprom_read_dword(&EE_TimeModes[DisplayN/10]);
+	for (unsigned char i=0; i<3; i++)
+	{
+		Time[i] = eeprom_read_byte(&EE_TimeModes[DisplayN/10][i]);
+	}
 }
 
 inline void ReadSettings(void)
@@ -486,7 +603,10 @@ inline void ReadSettings(void)
 
 inline void WriteTime(void)
 {
-	eeprom_write_dword(&EE_TimeModes[DisplayN/10], Time);
+	for (unsigned char i=0; i<3; i++)
+	{
+		eeprom_write_byte(&EE_TimeModes[DisplayN/10][i], Time[i]);
+	}
 }
 
 inline void WriteSettings(void)
@@ -503,4 +623,22 @@ void MirrorDigit(void)
 	RSeg ^= (1<<0);
 	SendTask(PrintParameters);
 	SendTimerTask(MirrorDigit, 500);
+}
+
+void Beep(uint16_t Time)
+{
+	if (((BuzzerPort&(1<<BuzzerNPin)) == 0) && (Settings[2] == 1))
+	{
+		BuzzerPort |= (1<<BuzzerNPin);
+		SendTimerTask(BuzzerOFF, Time);
+	}
+	else
+	{
+		BuzzerPort &= ~(1<<BuzzerNPin);
+	}
+}
+
+void BuzzerOFF(void)
+{
+	BuzzerPort &= ~(1<<BuzzerNPin);
 }
